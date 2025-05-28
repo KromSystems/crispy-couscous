@@ -1,0 +1,23 @@
+{
+  "name": "crispy-couscous",
+  "version": "1.0.0",
+  "description": "Бот, который помогает людям находить мудрость и ответы в \"Бхагавад-Гите\", основываясь на их вопросах или жизненных ситуациях. Он анализирует запрос пользователя и подбирает подходящий стих (или несколько) с пояснением из перевода Прабхупады.",
+  "main": "bot.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KromSystems/crispy-couscous.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/KromSystems/crispy-couscous/issues"
+  },
+  "homepage": "https://github.com/KromSystems/crispy-couscous#readme",
+  "dependencies": {
+    "node-telegram-bot-api": "^0.66.0"
+  }
+}
