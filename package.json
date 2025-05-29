@@ -20,6 +20,10 @@
   "dependencies": {
     "dotenv": "^16.5.0",
     "node-telegram-bot-api": "^0.66.0",
-    "openai": "^4.103.0"
+    "openai": "^4.103.0",
+    "sqlite3": "^5.1.6"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.22"
   }
 }
