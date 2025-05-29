@@ -6,7 +6,49 @@ const OpenAI = require('openai');
 const { startDailyVerseScheduler } = require('./dailyVerse');
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
-const bot = new TelegramBot(token, { polling: true });
+
+// Функция для создания и настройки бота
+function createBot() {
+    const bot = new TelegramBot(token, {
+        polling: {
+            interval: 300,
+            autoStart: true,
+            params: {
+                timeout: 10
+            }
+        }
+    });
+
+    // Обработка ошибок polling
+    bot.on('polling_error', (error) => {
+        console.error('Ошибка polling:', error);
+        
+        // Если произошел конфликт, перезапускаем бота
+        if (error.code === 'ETELEGRAM' && error.response && error.response.statusCode === 409) {
+            console.log('Обнаружен конфликт polling. Перезапуск бота...');
+            bot.stopPolling();
+            setTimeout(() => {
+                console.log('Попытка переподключения...');
+                bot.startPolling();
+            }, 5000); // Ждем 5 секунд перед переподключением
+        }
+    });
+
+    // Обработка ошибок webhook
+    bot.on('webhook_error', (error) => {
+        console.error('Ошибка webhook:', error);
+    });
+
+    // Обработка ошибок при отправке сообщений
+    bot.on('error', (error) => {
+        console.error('Общая ошибка бота:', error);
+    });
+
+    return bot;
+}
+
+// Создаем экземпляр бота
+const bot = createBot();
 
 // Инициализация OpenAI клиента для IO Intelligence API
 const openai = new OpenAI({
@@ -238,9 +280,17 @@ async function getAIResponse(userQuestion) {
   }
 }
 
-// Обработка ошибок
-bot.on('polling_error', (error) => {
-    console.error('Ошибка polling:', error);
+// Обработка завершения процесса
+process.on('SIGINT', () => {
+    console.log('Получен сигнал завершения. Останавливаем бота...');
+    bot.stopPolling();
+    process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+    console.log('Получен сигнал завершения. Останавливаем бота...');
+    bot.stopPolling();
+    process.exit(0);
 });
 
 // Запускаем ежедневную рассылку

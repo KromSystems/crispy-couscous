@@ -3,7 +3,12 @@ const TelegramBot = require('node-telegram-bot-api');
 const fs = require('fs');
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
-const bot = new TelegramBot(token, { polling: false });
+
+// Создаем отдельный экземпляр бота для рассылки без polling
+const bot = new TelegramBot(token, {
+    polling: false,
+    filepath: false
+});
 
 // Загрузка данных из JSON
 const gitaData = JSON.parse(fs.readFileSync('./gita-data.json', 'utf8'));
@@ -39,9 +44,12 @@ async function sendDailyVerse() {
             `💭 Комментарий:\n` +
             `${verse.commentary}`;
 
-        // Отправляем стих каждому подписчику
+        // Отправляем стих каждому подписчику с задержкой
         for (const subscriber of subscribers) {
             try {
+                // Добавляем небольшую задержку между отправками
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
                 await bot.sendMessage(subscriber.user_id, message);
                 await historyDB.addMessage(
                     subscriber.user_id,
@@ -55,6 +63,12 @@ async function sendDailyVerse() {
                 if (error.response && error.response.statusCode === 403) {
                     await subscriptionDB.removeSubscription(subscriber.user_id, 'daily_verse');
                     console.log(`Пользователь ${subscriber.user_id} заблокировал бота и был отписан`);
+                }
+                
+                // Если произошла ошибка сети, ждем немного и продолжаем
+                if (error.code === 'ETELEGRAM' && error.response && error.response.statusCode === 429) {
+                    console.log('Достигнут лимит запросов. Ждем 1 секунду...');
+                    await new Promise(resolve => setTimeout(resolve, 1000));
                 }
             }
         }
