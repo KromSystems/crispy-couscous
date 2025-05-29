@@ -4,7 +4,7 @@ const OpenAI = require('openai');
 require('dotenv').config();
 
 // Загрузка токена
-const token = '7533654645:AAFiUIPaheBQtqGEvlsLItdhL8XiP-VGN6M';
+const token = process.env.BOT_TOKEN;
 
 // Инициализация OpenAI клиента для IO Intelligence API
 const openai = new OpenAI({
