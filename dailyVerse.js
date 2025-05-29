@@ -1,14 +1,5 @@
 const { subscriptionDB, historyDB } = require('./database');
-const TelegramBot = require('node-telegram-bot-api');
 const fs = require('fs');
-
-const token = process.env.TELEGRAM_BOT_TOKEN;
-
-// Создаем отдельный экземпляр бота для рассылки без polling
-const bot = new TelegramBot(token, {
-    polling: false,
-    filepath: false
-});
 
 // Загрузка данных из JSON
 const gitaData = JSON.parse(fs.readFileSync('./gita-data.json', 'utf8'));
@@ -27,7 +18,7 @@ function getRandomVerse() {
 }
 
 // Функция для отправки ежедневного стиха всем подписчикам
-async function sendDailyVerse() {
+async function sendDailyVerse(bot) {
     try {
         // Получаем всех активных подписчиков
         const subscribers = await subscriptionDB.getAllActiveSubscribers('daily_verse');
@@ -78,7 +69,7 @@ async function sendDailyVerse() {
 }
 
 // Функция для запуска ежедневной рассылки
-function startDailyVerseScheduler() {
+function startDailyVerseScheduler(bot) {
     // Проверяем текущее время
     const now = new Date();
     const targetTime = new Date(now);
@@ -94,9 +85,9 @@ function startDailyVerseScheduler() {
 
     // Планируем первую рассылку
     setTimeout(() => {
-        sendDailyVerse();
+        sendDailyVerse(bot);
         // После первой рассылки планируем следующие каждые 24 часа
-        setInterval(sendDailyVerse, 24 * 60 * 60 * 1000);
+        setInterval(() => sendDailyVerse(bot), 24 * 60 * 60 * 1000);
     }, timeUntilNext);
 
     console.log(`Следующая рассылка запланирована на ${targetTime.toLocaleString()}`);
