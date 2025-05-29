@@ -18,6 +18,8 @@
   },
   "homepage": "https://github.com/KromSystems/crispy-couscous#readme",
   "dependencies": {
-    "node-telegram-bot-api": "^0.66.0"
+    "dotenv": "^16.5.0",
+    "node-telegram-bot-api": "^0.66.0",
+    "openai": "^4.103.0"
   }
 }
