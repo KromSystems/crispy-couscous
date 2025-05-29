@@ -294,6 +294,6 @@ process.on('SIGTERM', () => {
 });
 
 // Запускаем ежедневную рассылку
-startDailyVerseScheduler();
+startDailyVerseScheduler(bot);
 
 console.log('Бот запущен...');
